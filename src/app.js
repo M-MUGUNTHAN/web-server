@@ -7,6 +7,9 @@ app.get("/",(req,res)=>{
 app.get("/help",(req,res)=>{
     res.send("help page")
 })
+app.get("/about",(req,res)=>{
+    res.send("about page")
+})
 app.listen(port,()=>{
     console.log("running in port "+port)
 })
