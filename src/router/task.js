@@ -1,5 +1,6 @@
 const {Router}=require("express");
 const auth = require("../middleware/auth");
+const { listIndexes } = require("../models/task");
 const Task = require("../models/task");
 const router=new Router();
 
@@ -16,10 +17,30 @@ router.post("/tasks",auth,async(req,res)=>{
 })
 
 router.get("/tasks",auth,async(req,res)=>{
+    const match={};
+    const options={};
+    const {completed,limit,skip,sort}=req.query;
+    if(completed!==undefined){
+        match.completed=completed==="true"
+    }
+    if(limit!==undefined){
+     options.limit=parseInt(limit);
+    }
+    if(skip!==undefined){
+     options.skip=parseInt(skip);
+    }
     try{
-        // const tasks=await Task.find({owner:req.user._id});
-       await req.user.populate("tasks").execPopulate();
-       
+       await req.user.populate({
+           path:"tasks",
+           match,
+           options:{
+               ...options,
+               sort:{
+                   completed:-1,
+                   createdAt:-1,
+               }
+           }
+       }).execPopulate();
         res.status(200).send(req.user.tasks)
     } 
     catch(e){
